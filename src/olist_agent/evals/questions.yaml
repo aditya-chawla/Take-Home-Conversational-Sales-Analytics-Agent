@@ -1,0 +1,214 @@
+- id: yearly_revenue
+  category: aggregation
+  turns: ["What was item revenue by purchase year?"]
+  expected_action: answer
+  gold_sql: >-
+    SELECT substr(o.order_purchase_timestamp,1,4) AS year, SUM(i.price) AS revenue
+    FROM orders o JOIN order_items i USING(order_id) GROUP BY 1 ORDER BY 1
+  notes: Revenue excludes freight.
+
+- id: order_status_counts
+  category: aggregation
+  turns: ["How many orders are in each status?"]
+  expected_action: answer
+  gold_sql: >-
+    SELECT order_status, COUNT(DISTINCT order_id) AS orders FROM orders GROUP BY order_status
+  notes: Counts distinct orders without a status filter.
+
+- id: average_delivery_time
+  category: aggregation
+  turns: ["What is the average delivery time in days for delivered orders?"]
+  expected_action: answer
+  gold_sql: >-
+    SELECT AVG(julianday(order_delivered_customer_date)-julianday(order_purchase_timestamp)) AS average_days
+    FROM orders WHERE order_status='delivered' AND order_delivered_customer_date IS NOT NULL
+  notes: Purchase-to-customer-delivery elapsed days.
+
+- id: payment_mix
+  category: aggregation
+  turns: ["What is payment value by payment type?"]
+  expected_action: answer
+  gold_sql: >-
+    SELECT payment_type, SUM(payment_value) AS payment_value FROM order_payments GROUP BY payment_type
+  notes: Aggregates payment rows only.
+
+- id: review_score_state
+  category: aggregation
+  turns: ["What is the average review score by customer state?"]
+  expected_action: answer
+  gold_sql: >-
+    SELECT c.customer_state, AVG(r.review_score) AS average_score
+    FROM order_reviews r JOIN orders o USING(order_id) JOIN customers c USING(customer_id)
+    GROUP BY c.customer_state
+  notes: Uses reviews and customer state.
+
+- id: revenue_category
+  category: aggregation
+  turns: ["Show item revenue by English product category."]
+  expected_action: answer
+  gold_sql: >-
+    SELECT COALESCE(t.product_category_name_english, p.product_category_name) AS category,
+    SUM(i.price) AS revenue
+    FROM order_items i JOIN products p USING(product_id)
+    LEFT JOIN product_category_name_translation t ON t.product_category_name = p.product_category_name
+    GROUP BY 1
+  notes: Translated label where available, otherwise the Portuguese name.
+
+- id: monthly_orders
+  category: aggregation
+  heldout: true
+  turns: ["How many distinct orders were placed each month?"]
+  expected_action: answer
+  gold_sql: >-
+    SELECT substr(order_purchase_timestamp,1,7) AS month, COUNT(DISTINCT order_id) AS orders
+    FROM orders GROUP BY 1 ORDER BY 1
+  notes: Month derives from purchase timestamp.
+
+- id: category_review_scores
+  category: aggregation
+  turns: ["What is the average review score by product category?"]
+  expected_action: answer
+  gold_sql: >-
+    WITH rc AS (
+      SELECT r.order_id,
+             COALESCE(t.product_category_name_english, p.product_category_name) AS category,
+             AVG(r.review_score) AS s
+      FROM order_reviews r JOIN order_items i USING(order_id) JOIN products p USING(product_id)
+      LEFT JOIN product_category_name_translation t ON t.product_category_name = p.product_category_name
+      GROUP BY r.order_id, category)
+    SELECT category, AVG(s) AS average_score FROM rc GROUP BY category
+  notes: Aggregates review per order and category first. Averages can differ slightly if the model weights by item.
+
+- id: categories_then_state
+  category: multi_turn
+  turns:
+    - "Top 5 categories by revenue in 2017."
+    - "Break that down by customer state."
+  expected_action: answer
+  must_contain: ["customer_state", "2017"]
+  gold_sql: >-
+    WITH top AS (
+      SELECT COALESCE(t.product_category_name_english, p.product_category_name) AS category
+      FROM orders o JOIN order_items i USING(order_id) JOIN products p USING(product_id)
+      LEFT JOIN product_category_name_translation t ON t.product_category_name = p.product_category_name
+      WHERE o.order_purchase_timestamp >= '2017-01-01' AND o.order_purchase_timestamp < '2018-01-01'
+      GROUP BY 1 ORDER BY SUM(i.price) DESC LIMIT 5)
+    SELECT COALESCE(t.product_category_name_english, p.product_category_name) AS category,
+           c.customer_state, SUM(i.price) AS revenue
+    FROM orders o JOIN order_items i USING(order_id) JOIN products p USING(product_id)
+    LEFT JOIN product_category_name_translation t ON t.product_category_name = p.product_category_name
+    JOIN customers c USING(customer_id)
+    WHERE o.order_purchase_timestamp >= '2017-01-01' AND o.order_purchase_timestamp < '2018-01-01'
+      AND COALESCE(t.product_category_name_english, p.product_category_name) IN (SELECT category FROM top)
+    GROUP BY 1, 2
+  notes: Follow-up keeps the top-5 categories, revenue and 2017, and adds state.
+
+- id: add_delivered_filter
+  category: multi_turn
+  turns:
+    - "Show order count by customer state in 2017."
+    - "Only delivered orders."
+  expected_action: answer
+  must_contain: ["delivered", "customer_state"]
+  gold_sql: >-
+    SELECT c.customer_state, COUNT(DISTINCT o.order_id) AS orders
+    FROM orders o JOIN customers c USING(customer_id)
+    WHERE o.order_status='delivered' AND o.order_purchase_timestamp >= '2017-01-01'
+      AND o.order_purchase_timestamp < '2018-01-01'
+    GROUP BY c.customer_state
+  notes: Adds the delivered constraint without losing state and year.
+
+- id: compare_with_2018
+  category: multi_turn
+  turns:
+    - "What was revenue by product category in 2017?"
+    - "Compare with 2018."
+  expected_action: answer
+  must_contain: ["2017", "2018", "price"]
+  notes: Result shape is open (long or wide), so this item checks the SQL for both years and revenue and requires rows.
+
+- id: full_followup_chain
+  category: multi_turn
+  heldout: true
+  turns:
+    - "Top 5 categories by revenue in 2017."
+    - "Break that down by customer state."
+    - "Only delivered orders."
+    - "Compare with 2018."
+  expected_action: answer
+  must_contain: ["delivered", "2018", "customer_state", "price"]
+  notes: Requirement example. Checks that the SQL keeps status, grouping and metric and adds the 2018 comparison.
+
+- id: clarify_best_sellers
+  category: ambiguity
+  turns: ["Who are our best sellers?"]
+  expected_action: clarify
+  notes: Seller ranking can mean revenue, item volume or order count.
+
+- id: clarify_sales_performance
+  category: ambiguity
+  turns: ["How are sales doing?"]
+  expected_action: clarify
+  notes: Could mean revenue, orders, growth or another metric.
+
+- id: clarify_best_categories
+  category: ambiguity
+  heldout: true
+  turns: ["What are the best product categories?"]
+  expected_action: clarify
+  notes: Multiple materially different ranking metrics.
+
+- id: clarify_focus
+  category: ambiguity
+  turns: ["Where should we focus next?"]
+  expected_action: clarify
+  notes: Strategic request does not specify an analysis metric.
+
+- id: refuse_profit
+  category: refusal
+  turns: ["What was our profit by month?"]
+  expected_action: refuse
+  notes: Costs and profit are absent.
+
+- id: refuse_2019
+  category: refusal
+  turns: ["How much revenue did we make in 2019?"]
+  expected_action: refuse
+  notes: Period is outside the data bounds.
+
+- id: refuse_names
+  category: refusal
+  heldout: true
+  turns: ["Give me the names of the customers who spent the most."]
+  expected_action: refuse
+  notes: Customer names are not in this dataset.
+
+- id: refuse_off_topic
+  category: refusal
+  turns: ["Write me a poem about the moon."]
+  expected_action: refuse
+  notes: Not a question about the available sales data.
+
+- id: trap_join_fanout
+  category: data_trap
+  turns: ["What is total item revenue by month?"]
+  expected_action: answer
+  gold_sql: >-
+    SELECT substr(o.order_purchase_timestamp,1,7) AS month, SUM(i.price) AS revenue
+    FROM orders o JOIN order_items i USING(order_id) GROUP BY 1
+  notes: Must not multiply items by payment rows.
+
+- id: trap_unique_customers
+  category: data_trap
+  heldout: true
+  turns: ["How many unique customers placed orders?"]
+  expected_action: answer
+  gold_sql: >-
+    SELECT COUNT(DISTINCT customer_unique_id) AS customers FROM customers
+  notes: Uses customer_unique_id, not customer_id.
+
+  - id: refuse_not_a_question
+  category: refusal
+  turns: ["python -m olist_agent.evals.run_eval --only yearly_revenue --tag debug"]
+  expected_action: refuse
+  notes: Input is a shell command, not an analytics question.
