@@ -1,0 +1,7 @@
+pandas>=2.2,<3
+PyYAML>=6.0,<7
+langchain-ollama>=1.0,<2
+langgraph>=0.3,<2
+sqlglot>=26,<30
+rich>=13.9,<15
+pytest>=8,<9

@@ -1,0 +1,77 @@
+global:
+  units: BRL for monetary fields; timestamps are ISO strings; weights are grams; dimensions are centimeters.
+  relationships:
+    - orders.order_id joins order_items.order_id, order_payments.order_id, and order_reviews.order_id.
+    - orders.customer_id joins customers.customer_id.
+    - order_items.product_id joins products.product_id; order_items.seller_id joins sellers.seller_id.
+    - products.product_category_name joins product_category_name_translation.product_category_name.
+tables:
+  orders:
+    description: One row per customer order.
+    columns:
+      order_id: Unique order identifier.
+      customer_id: Customer identifier for this order; not a stable person identity.
+      order_status: Current order lifecycle status.
+      order_purchase_timestamp: Time the order was placed; default time anchor for sales.
+      order_approved_at: Payment approval timestamp.
+      order_delivered_carrier_date: Handoff to carrier timestamp.
+      order_delivered_customer_date: Customer delivery timestamp.
+      order_estimated_delivery_date: Estimated delivery timestamp.
+  order_items:
+    description: One row per item within an order.
+    columns:
+      order_id: Parent order identifier.
+      order_item_id: Item sequence within an order.
+      product_id: Product identifier.
+      seller_id: Seller identifier.
+      shipping_limit_date: Seller shipping deadline.
+      price: Item price in BRL; use SUM(price) for revenue and exclude freight.
+      freight_value: Shipping charge in BRL; not included in default revenue.
+  order_payments:
+    description: One row per payment installment/type per order; joining directly with items can multiply rows.
+    columns:
+      order_id: Parent order identifier.
+      payment_sequential: Payment sequence within an order.
+      payment_type: Payment method/type.
+      payment_installments: Number of installments.
+      payment_value: Payment amount in BRL.
+  order_reviews:
+    description: Review records; use scores and timestamps, not Portuguese free-text comments.
+    columns:
+      review_id: Review identifier.
+      order_id: Related order identifier.
+      review_score: Customer rating from 1 to 5.
+      review_creation_date: Review creation timestamp.
+      review_answer_timestamp: Review response timestamp.
+  customers:
+    description: Customer address record for an order relationship; multiple customer_id values may share customer_unique_id.
+    columns:
+      customer_id: Order-specific customer identifier.
+      customer_unique_id: Stable unique customer identity for distinct-customer counts.
+      customer_zip_code_prefix: Customer ZIP prefix.
+      customer_city: Customer city.
+      customer_state: Customer state.
+  sellers:
+    description: Seller address and identity.
+    columns:
+      seller_id: Unique seller identifier.
+      seller_zip_code_prefix: Seller ZIP prefix.
+      seller_city: Seller city.
+      seller_state: Seller state.
+  products:
+    description: Product catalog data.
+    columns:
+      product_id: Unique product identifier.
+      product_category_name: Original Portuguese category identifier/name.
+      product_name_lenght: Product name length (source column spelling).
+      product_description_lenght: Product description length (source column spelling).
+      product_photos_qty: Number of product photos.
+      product_weight_g: Product weight in grams.
+      product_length_cm: Product length in centimeters.
+      product_height_cm: Product height in centimeters.
+      product_width_cm: Product width in centimeters.
+  product_category_name_translation:
+    description: Mapping from Portuguese product category names to English translations.
+    columns:
+      product_category_name: Original Portuguese category name.
+      product_category_name_english: English category label.

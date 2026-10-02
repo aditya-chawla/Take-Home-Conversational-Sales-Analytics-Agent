@@ -1,0 +1,10 @@
+data/
+*.db
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.pyc
+traces/
+evals/results/
+*.egg-info/
