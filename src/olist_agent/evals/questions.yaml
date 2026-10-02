@@ -207,7 +207,7 @@
     SELECT COUNT(DISTINCT customer_unique_id) AS customers FROM customers
   notes: Uses customer_unique_id, not customer_id.
 
-  - id: refuse_not_a_question
+- id: refuse_not_a_question
   category: refusal
   turns: ["python -m olist_agent.evals.run_eval --only yearly_revenue --tag debug"]
   expected_action: refuse

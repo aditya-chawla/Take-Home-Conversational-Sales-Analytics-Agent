@@ -9,7 +9,7 @@ from langchain_ollama import ChatOllama
 
 from . import config
 
-THINKING_MODELS = ("qwen3", "deepseek-r1", "gpt-oss")
+THINKING_MODELS = ("qwen3")
 CALL_LOG: list[dict[str, Any]] = []
 
 

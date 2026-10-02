@@ -37,10 +37,14 @@ def _run_case(graph, case: dict, db_path: Path) -> dict[str, Any]:
     thread_id = new_thread_id()
     state: dict[str, Any] = {}
     error = ""
+    total_retries = 0
+    all_calls: list[dict] = []
     started = time.monotonic()
     try:
         for turn in case["turns"]:
             state = graph.invoke({"question": turn}, {"configurable": {"thread_id": thread_id}})
+            total_retries += state.get("retries", 0)
+            all_calls.extend(state.get("trace", {}).get("llm_calls", []))
     except Exception as exc:
         error = f"{type(exc).__name__}: {exc}"
 
@@ -53,7 +57,9 @@ def _run_case(graph, case: dict, db_path: Path) -> dict[str, Any]:
     if passed and expected_action == "answer":
         sql_lower = state.get("sql", "").lower()
         missing = [t for t in case.get("must_contain", []) if t.lower() not in sql_lower]
-        if missing:
+        if not generated.get("rows"):
+            passed, error = False, state.get("error") or "No rows returned."
+        elif missing:
             passed, error = False, f"Generated SQL is missing expected terms: {missing}"
         elif case.get("gold_sql"):
             try:
@@ -64,11 +70,7 @@ def _run_case(graph, case: dict, db_path: Path) -> dict[str, Any]:
                     passed = _same_rows(generated.get("rows", []), gold_rows)
             except Exception as exc:
                 passed, error = False, f"Gold query failed: {exc}"
-        elif not generated.get("rows"):
-            passed, error = False, "No rows returned."
 
-    trace = state.get("trace", {})
-    calls = trace.get("llm_calls", [])
     return {
         "id": case["id"],
         "category": case["category"],
@@ -81,9 +83,9 @@ def _run_case(graph, case: dict, db_path: Path) -> dict[str, Any]:
         "rows": generated.get("rows", [])[:50],
         "gold_rows": gold_rows[:50] if gold_rows else gold_rows,
         "latency_seconds": round(time.monotonic() - started, 3),
-        "retries": state.get("retries", 0),
-        "llm_calls": calls,
-        "prefill_seconds": round(sum(c.get("prefill_s", 0) for c in calls), 1),
+        "retries": total_retries,
+        "llm_calls": all_calls,
+        "prefill_seconds": round(sum(c.get("prefill_s", 0) for c in all_calls), 1),
     }
 
 
@@ -126,12 +128,13 @@ def _write_outputs(results: list[dict], model: str, tag: str, started: float) ->
     failures = [r for r in results if not r["passed"]]
     if failures:
         for r in failures:
-            lines.extend([
+            lines.append(
                 f"### {r['id']}",
-                f"- Expected/actual action: {r['expected_action']} / {r['actual_action']}",
-                f"- Error: {r['error']}",
-                f"- Generated SQL: `{r['sql']}`", "",
-            ])
+            )
+            lines.append(f"- Expected/actual action: {r['expected_action']} / {r['actual_action']}")
+            if r["error"]:
+                lines.append(f"- Error: {r['error']}")
+            lines.extend([f"- Generated SQL: `{r['sql']}`", ""])
     else:
         lines.append("No failures.")
     md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -165,14 +168,13 @@ def run_evaluation(model: str, tag: str, db_path: Path, only: set[str] | None = 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate the local Olist analytics graph")
     parser.add_argument("--model", default=config.MODEL_NAME)
-    parser.add_argument("--tag", default="baseline_raw_tables")
+    parser.add_argument("--tag", default=time.strftime("run_%Y%m%d_%H%M%S"))
     parser.add_argument("--db", type=Path, default=config.DB_PATH)
     parser.add_argument("--only", default="", help="Comma-separated case ids")
     args = parser.parse_args()
     only = {x.strip() for x in args.only.split(",") if x.strip()} or None
     json_path, md_path = run_evaluation(args.model, args.tag, args.db, only)
     print(f"Saved evaluation outputs: {json_path} and {md_path}", flush=True)
-
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,3034 @@
+{
+  "tag": "after_fixes",
+  "model": "qwen3:8b",
+  "count": 23,
+  "passed": 19,
+  "accuracy": 0.8260869565217391,
+  "heldout_count": 5,
+  "heldout_passed": 5,
+  "mean_latency_seconds": 33.01165217391304,
+  "total_elapsed_seconds": 759.365,
+  "mean_retries": 0,
+  "results": [
+    {
+      "id": "yearly_revenue",
+      "category": "aggregation",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT STRFTIME('%Y', o.order_purchase_timestamp) AS year, SUM(i.price) AS revenue FROM orders AS o JOIN order_items AS i USING (order_id) GROUP BY year LIMIT 200",
+      "rows": [
+        [
+          "2016",
+          49785.92
+        ],
+        [
+          "2017",
+          6155806.98
+        ],
+        [
+          "2018",
+          7386050.8
+        ]
+      ],
+      "gold_rows": [
+        [
+          "2016",
+          49785.92
+        ],
+        [
+          "2017",
+          6155806.98
+        ],
+        [
+          "2018",
+          7386050.8
+        ]
+      ],
+      "latency_seconds": 113.323,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1949,
+          "output_tokens": 80,
+          "prefill_s": 99.0,
+          "gen_s": 11.3,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 99.0
+    },
+    {
+      "id": "order_status_counts",
+      "category": "aggregation",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT order_status, COUNT(DISTINCT order_id) AS orders FROM orders GROUP BY order_status LIMIT 200",
+      "rows": [
+        [
+          "approved",
+          2
+        ],
+        [
+          "canceled",
+          625
+        ],
+        [
+          "created",
+          5
+        ],
+        [
+          "delivered",
+          96478
+        ],
+        [
+          "invoiced",
+          314
+        ],
+        [
+          "processing",
+          301
+        ],
+        [
+          "shipped",
+          1107
+        ],
+        [
+          "unavailable",
+          609
+        ]
+      ],
+      "gold_rows": [
+        [
+          "approved",
+          2
+        ],
+        [
+          "canceled",
+          625
+        ],
+        [
+          "created",
+          5
+        ],
+        [
+          "delivered",
+          96478
+        ],
+        [
+          "invoiced",
+          314
+        ],
+        [
+          "processing",
+          301
+        ],
+        [
+          "shipped",
+          1107
+        ],
+        [
+          "unavailable",
+          609
+        ]
+      ],
+      "latency_seconds": 11.146,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1949,
+          "output_tokens": 66,
+          "prefill_s": 1.4,
+          "gen_s": 9.0,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.4
+    },
+    {
+      "id": "average_delivery_time",
+      "category": "aggregation",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT AVG(JULIANDAY(order_delivered_customer_date) - JULIANDAY(order_purchase_timestamp)) AS average_delivery_days FROM orders WHERE order_status = 'delivered' AND NOT order_delivered_customer_date IS NULL LIMIT 200",
+      "rows": [
+        [
+          12.558217098051923
+        ]
+      ],
+      "gold_rows": [
+        [
+          12.558217098051923
+        ]
+      ],
+      "latency_seconds": 14.99,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1953,
+          "output_tokens": 96,
+          "prefill_s": 1.5,
+          "gen_s": 13.1,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.5
+    },
+    {
+      "id": "payment_mix",
+      "category": "aggregation",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT payment_type, SUM(payment_value) AS value FROM order_payments GROUP BY payment_type LIMIT 200",
+      "rows": [
+        [
+          "boleto",
+          2869361.27
+        ],
+        [
+          "credit_card",
+          12542084.19
+        ],
+        [
+          "debit_card",
+          217989.79
+        ],
+        [
+          "not_defined",
+          0.0
+        ],
+        [
+          "voucher",
+          379436.87
+        ]
+      ],
+      "gold_rows": [
+        [
+          "boleto",
+          2869361.27
+        ],
+        [
+          "credit_card",
+          12542084.19
+        ],
+        [
+          "debit_card",
+          217989.79
+        ],
+        [
+          "not_defined",
+          0.0
+        ],
+        [
+          "voucher",
+          379436.87
+        ]
+      ],
+      "latency_seconds": 10.831,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1949,
+          "output_tokens": 64,
+          "prefill_s": 1.4,
+          "gen_s": 9.1,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.4
+    },
+    {
+      "id": "review_score_state",
+      "category": "aggregation",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT c.customer_state, AVG(r.review_score) AS average_score FROM order_reviews AS r JOIN orders AS o USING (order_id) JOIN customers AS c USING (customer_id) GROUP BY c.customer_state LIMIT 200",
+      "rows": [
+        [
+          "AC",
+          4.049382716049383
+        ],
+        [
+          "AL",
+          3.751207729468599
+        ],
+        [
+          "AM",
+          4.183673469387755
+        ],
+        [
+          "AP",
+          4.1940298507462686
+        ],
+        [
+          "BA",
+          3.8608876973488235
+        ],
+        [
+          "CE",
+          3.851015801354402
+        ],
+        [
+          "DF",
+          4.064711359404097
+        ],
+        [
+          "ES",
+          4.041666666666667
+        ],
+        [
+          "GO",
+          4.042490118577075
+        ],
+        [
+          "MA",
+          3.7640750670241285
+        ],
+        [
+          "MG",
+          4.1361720430107525
+        ],
+        [
+          "MS",
+          4.1187845303867405
+        ],
+        [
+          "MT",
+          4.102990033222591
+        ],
+        [
+          "PA",
+          3.8491735537190084
+        ],
+        [
+          "PB",
+          4.018832391713747
+        ],
+        [
+          "PE",
+          4.011543134872418
+        ],
+        [
+          "PI",
+          3.920570264765784
+        ],
+        [
+          "PR",
+          4.180031758634379
+        ],
+        [
+          "RJ",
+          3.8749706227967096
+        ],
+        [
+          "RN",
+          4.105809128630705
+        ],
+        [
+          "RO",
+          4.051587301587301
+        ],
+        [
+          "RR",
+          3.608695652173913
+        ],
+        [
+          "RS",
+          4.1333211745394856
+        ],
+        [
+          "SC",
+          4.071763731714049
+        ],
+        [
+          "SE",
+          3.8080229226361033
+        ],
+        [
+          "SP",
+          4.173950587670904
+        ],
+        [
+          "TO",
+          4.096774193548387
+        ]
+      ],
+      "gold_rows": [
+        [
+          "AC",
+          4.049382716049383
+        ],
+        [
+          "AL",
+          3.751207729468599
+        ],
+        [
+          "AM",
+          4.183673469387755
+        ],
+        [
+          "AP",
+          4.1940298507462686
+        ],
+        [
+          "BA",
+          3.8608876973488235
+        ],
+        [
+          "CE",
+          3.851015801354402
+        ],
+        [
+          "DF",
+          4.064711359404097
+        ],
+        [
+          "ES",
+          4.041666666666667
+        ],
+        [
+          "GO",
+          4.042490118577075
+        ],
+        [
+          "MA",
+          3.7640750670241285
+        ],
+        [
+          "MG",
+          4.1361720430107525
+        ],
+        [
+          "MS",
+          4.1187845303867405
+        ],
+        [
+          "MT",
+          4.102990033222591
+        ],
+        [
+          "PA",
+          3.8491735537190084
+        ],
+        [
+          "PB",
+          4.018832391713747
+        ],
+        [
+          "PE",
+          4.011543134872418
+        ],
+        [
+          "PI",
+          3.920570264765784
+        ],
+        [
+          "PR",
+          4.180031758634379
+        ],
+        [
+          "RJ",
+          3.8749706227967096
+        ],
+        [
+          "RN",
+          4.105809128630705
+        ],
+        [
+          "RO",
+          4.051587301587301
+        ],
+        [
+          "RR",
+          3.608695652173913
+        ],
+        [
+          "RS",
+          4.1333211745394856
+        ],
+        [
+          "SC",
+          4.071763731714049
+        ],
+        [
+          "SE",
+          3.8080229226361033
+        ],
+        [
+          "SP",
+          4.173950587670904
+        ],
+        [
+          "TO",
+          4.096774193548387
+        ]
+      ],
+      "latency_seconds": 16.891,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1951,
+          "output_tokens": 86,
+          "prefill_s": 1.3,
+          "gen_s": 11.7,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.3
+    },
+    {
+      "id": "revenue_category",
+      "category": "aggregation",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT COALESCE(pct.product_category_name_english, pc.product_category_name) AS category, SUM(i.price) AS revenue FROM order_items AS i JOIN products AS pc ON i.product_id = pc.product_id LEFT JOIN product_category_name_translation AS pct ON pc.product_category_name = pct.product_category_name GROUP BY category LIMIT 200",
+      "rows": [
+        [
+          null,
+          179535.28
+        ],
+        [
+          "agro_industry_and_commerce",
+          72530.47
+        ],
+        [
+          "air_conditioning",
+          55024.96
+        ],
+        [
+          "art",
+          24202.64
+        ],
+        [
+          "arts_and_craftmanship",
+          1814.01
+        ],
+        [
+          "audio",
+          50688.5
+        ],
+        [
+          "auto",
+          592720.11
+        ],
+        [
+          "baby",
+          411764.89
+        ],
+        [
+          "bed_bath_table",
+          1036988.68
+        ],
+        [
+          "books_general_interest",
+          46856.88
+        ],
+        [
+          "books_imported",
+          4639.85
+        ],
+        [
+          "books_technical",
+          19096.06
+        ],
+        [
+          "cds_dvds_musicals",
+          730.0
+        ],
+        [
+          "christmas_supplies",
+          8800.82
+        ],
+        [
+          "cine_photo",
+          6933.46
+        ],
+        [
+          "computers",
+          222963.13
+        ],
+        [
+          "computers_accessories",
+          911954.32
+        ],
+        [
+          "consoles_games",
+          157465.22
+        ],
+        [
+          "construction_tools_construction",
+          144677.59
+        ],
+        [
+          "construction_tools_lights",
+          41080.0
+        ],
+        [
+          "construction_tools_safety",
+          40544.52
+        ],
+        [
+          "cool_stuff",
+          635290.85
+        ],
+        [
+          "costruction_tools_garden",
+          25715.89
+        ],
+        [
+          "costruction_tools_tools",
+          15903.95
+        ],
+        [
+          "diapers_and_hygiene",
+          1567.59
+        ],
+        [
+          "drinks",
+          22428.7
+        ],
+        [
+          "dvds_blu_ray",
+          5999.39
+        ],
+        [
+          "electronics",
+          160246.74
+        ],
+        [
+          "fashio_female_clothing",
+          2803.64
+        ],
+        [
+          "fashion_bags_accessories",
+          152823.54
+        ],
+        [
+          "fashion_childrens_clothes",
+          569.85
+        ],
+        [
+          "fashion_male_clothing",
+          10797.82
+        ],
+        [
+          "fashion_shoes",
+          23562.77
+        ],
+        [
+          "fashion_sport",
+          2119.51
+        ],
+        [
+          "fashion_underwear_beach",
+          9541.55
+        ],
+        [
+          "fixed_telephony",
+          59583.0
+        ],
+        [
+          "flowers",
+          1110.04
+        ],
+        [
+          "food",
+          29393.41
+        ],
+        [
+          "food_drink",
+          15179.48
+        ],
+        [
+          "furniture_bedroom",
+          20028.78
+        ],
+        [
+          "furniture_decor",
+          729762.49
+        ],
+        [
+          "furniture_living_room",
+          68916.56
+        ],
+        [
+          "furniture_mattress_and_upholstery",
+          4368.08
+        ],
+        [
+          "garden_tools",
+          485256.46
+        ],
+        [
+          "health_beauty",
+          1258681.34
+        ],
+        [
+          "home_appliances",
+          80171.53
+        ],
+        [
+          "home_appliances_2",
+          113317.74
+        ],
+        [
+          "home_comfort_2",
+          760.27
+        ],
+        [
+          "home_confort",
+          58572.04
+        ],
+        [
+          "home_construction",
+          83088.12
+        ]
+      ],
+      "gold_rows": [
+        [
+          null,
+          179535.28
+        ],
+        [
+          "agro_industry_and_commerce",
+          72530.47
+        ],
+        [
+          "air_conditioning",
+          55024.96
+        ],
+        [
+          "art",
+          24202.64
+        ],
+        [
+          "arts_and_craftmanship",
+          1814.01
+        ],
+        [
+          "audio",
+          50688.5
+        ],
+        [
+          "auto",
+          592720.11
+        ],
+        [
+          "baby",
+          411764.89
+        ],
+        [
+          "bed_bath_table",
+          1036988.68
+        ],
+        [
+          "books_general_interest",
+          46856.88
+        ],
+        [
+          "books_imported",
+          4639.85
+        ],
+        [
+          "books_technical",
+          19096.06
+        ],
+        [
+          "cds_dvds_musicals",
+          730.0
+        ],
+        [
+          "christmas_supplies",
+          8800.82
+        ],
+        [
+          "cine_photo",
+          6933.46
+        ],
+        [
+          "computers",
+          222963.13
+        ],
+        [
+          "computers_accessories",
+          911954.32
+        ],
+        [
+          "consoles_games",
+          157465.22
+        ],
+        [
+          "construction_tools_construction",
+          144677.59
+        ],
+        [
+          "construction_tools_lights",
+          41080.0
+        ],
+        [
+          "construction_tools_safety",
+          40544.52
+        ],
+        [
+          "cool_stuff",
+          635290.85
+        ],
+        [
+          "costruction_tools_garden",
+          25715.89
+        ],
+        [
+          "costruction_tools_tools",
+          15903.95
+        ],
+        [
+          "diapers_and_hygiene",
+          1567.59
+        ],
+        [
+          "drinks",
+          22428.7
+        ],
+        [
+          "dvds_blu_ray",
+          5999.39
+        ],
+        [
+          "electronics",
+          160246.74
+        ],
+        [
+          "fashio_female_clothing",
+          2803.64
+        ],
+        [
+          "fashion_bags_accessories",
+          152823.54
+        ],
+        [
+          "fashion_childrens_clothes",
+          569.85
+        ],
+        [
+          "fashion_male_clothing",
+          10797.82
+        ],
+        [
+          "fashion_shoes",
+          23562.77
+        ],
+        [
+          "fashion_sport",
+          2119.51
+        ],
+        [
+          "fashion_underwear_beach",
+          9541.55
+        ],
+        [
+          "fixed_telephony",
+          59583.0
+        ],
+        [
+          "flowers",
+          1110.04
+        ],
+        [
+          "food",
+          29393.41
+        ],
+        [
+          "food_drink",
+          15179.48
+        ],
+        [
+          "furniture_bedroom",
+          20028.78
+        ],
+        [
+          "furniture_decor",
+          729762.49
+        ],
+        [
+          "furniture_living_room",
+          68916.56
+        ],
+        [
+          "furniture_mattress_and_upholstery",
+          4368.08
+        ],
+        [
+          "garden_tools",
+          485256.46
+        ],
+        [
+          "health_beauty",
+          1258681.34
+        ],
+        [
+          "home_appliances",
+          80171.53
+        ],
+        [
+          "home_appliances_2",
+          113317.74
+        ],
+        [
+          "home_comfort_2",
+          760.27
+        ],
+        [
+          "home_confort",
+          58572.04
+        ],
+        [
+          "home_construction",
+          83088.12
+        ]
+      ],
+      "latency_seconds": 17.897,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1949,
+          "output_tokens": 107,
+          "prefill_s": 1.3,
+          "gen_s": 14.6,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.3
+    },
+    {
+      "id": "monthly_orders",
+      "category": "aggregation",
+      "heldout": true,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT STRFTIME('%Y-%m', o.order_purchase_timestamp) AS month, COUNT(DISTINCT o.order_id) AS orders FROM orders AS o GROUP BY month ORDER BY month LIMIT 200",
+      "rows": [
+        [
+          "2016-09",
+          4
+        ],
+        [
+          "2016-10",
+          324
+        ],
+        [
+          "2016-12",
+          1
+        ],
+        [
+          "2017-01",
+          800
+        ],
+        [
+          "2017-02",
+          1780
+        ],
+        [
+          "2017-03",
+          2682
+        ],
+        [
+          "2017-04",
+          2404
+        ],
+        [
+          "2017-05",
+          3700
+        ],
+        [
+          "2017-06",
+          3245
+        ],
+        [
+          "2017-07",
+          4026
+        ],
+        [
+          "2017-08",
+          4331
+        ],
+        [
+          "2017-09",
+          4285
+        ],
+        [
+          "2017-10",
+          4631
+        ],
+        [
+          "2017-11",
+          7544
+        ],
+        [
+          "2017-12",
+          5673
+        ],
+        [
+          "2018-01",
+          7269
+        ],
+        [
+          "2018-02",
+          6728
+        ],
+        [
+          "2018-03",
+          7211
+        ],
+        [
+          "2018-04",
+          6939
+        ],
+        [
+          "2018-05",
+          6873
+        ],
+        [
+          "2018-06",
+          6167
+        ],
+        [
+          "2018-07",
+          6292
+        ],
+        [
+          "2018-08",
+          6512
+        ],
+        [
+          "2018-09",
+          16
+        ],
+        [
+          "2018-10",
+          4
+        ]
+      ],
+      "gold_rows": [
+        [
+          "2016-09",
+          4
+        ],
+        [
+          "2016-10",
+          324
+        ],
+        [
+          "2016-12",
+          1
+        ],
+        [
+          "2017-01",
+          800
+        ],
+        [
+          "2017-02",
+          1780
+        ],
+        [
+          "2017-03",
+          2682
+        ],
+        [
+          "2017-04",
+          2404
+        ],
+        [
+          "2017-05",
+          3700
+        ],
+        [
+          "2017-06",
+          3245
+        ],
+        [
+          "2017-07",
+          4026
+        ],
+        [
+          "2017-08",
+          4331
+        ],
+        [
+          "2017-09",
+          4285
+        ],
+        [
+          "2017-10",
+          4631
+        ],
+        [
+          "2017-11",
+          7544
+        ],
+        [
+          "2017-12",
+          5673
+        ],
+        [
+          "2018-01",
+          7269
+        ],
+        [
+          "2018-02",
+          6728
+        ],
+        [
+          "2018-03",
+          7211
+        ],
+        [
+          "2018-04",
+          6939
+        ],
+        [
+          "2018-05",
+          6873
+        ],
+        [
+          "2018-06",
+          6167
+        ],
+        [
+          "2018-07",
+          6292
+        ],
+        [
+          "2018-08",
+          6512
+        ],
+        [
+          "2018-09",
+          16
+        ],
+        [
+          "2018-10",
+          4
+        ]
+      ],
+      "latency_seconds": 13.034,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1950,
+          "output_tokens": 81,
+          "prefill_s": 1.5,
+          "gen_s": 10.9,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.5
+    },
+    {
+      "id": "category_review_scores",
+      "category": "aggregation",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": false,
+      "error": "",
+      "sql": "SELECT COALESCE(pc.product_category_name_english, pc.product_category_name) AS product_category, AVG(r.review_score) AS average_score FROM order_reviews AS r JOIN orders AS o USING (order_id) JOIN order_items AS i USING (order_id) JOIN products AS p USING (product_id) JOIN product_category_name_translation AS pc USING (product_category_name) GROUP BY product_category LIMIT 200",
+      "rows": [
+        [
+          "agro_industry_and_commerce",
+          4.0
+        ],
+        [
+          "air_conditioning",
+          3.969178082191781
+        ],
+        [
+          "art",
+          3.9371980676328504
+        ],
+        [
+          "arts_and_craftmanship",
+          4.125
+        ],
+        [
+          "audio",
+          3.8254847645429364
+        ],
+        [
+          "auto",
+          4.065511511986708
+        ],
+        [
+          "baby",
+          4.011811023622047
+        ],
+        [
+          "bed_bath_table",
+          3.8956631049654304
+        ],
+        [
+          "books_general_interest",
+          4.446265938069216
+        ],
+        [
+          "books_imported",
+          4.4
+        ],
+        [
+          "books_technical",
+          4.368421052631579
+        ],
+        [
+          "cds_dvds_musicals",
+          4.642857142857143
+        ],
+        [
+          "christmas_supplies",
+          4.02054794520548
+        ],
+        [
+          "cine_photo",
+          4.205479452054795
+        ],
+        [
+          "computers",
+          4.175
+        ],
+        [
+          "computers_accessories",
+          3.9308192126385526
+        ],
+        [
+          "consoles_games",
+          4.0230700976042595
+        ],
+        [
+          "construction_tools_construction",
+          4.052915766738661
+        ],
+        [
+          "construction_tools_lights",
+          4.054054054054054
+        ],
+        [
+          "construction_tools_safety",
+          3.844559585492228
+        ],
+        [
+          "cool_stuff",
+          4.146341463414634
+        ],
+        [
+          "costruction_tools_garden",
+          4.054166666666666
+        ],
+        [
+          "costruction_tools_tools",
+          4.444444444444445
+        ],
+        [
+          "diapers_and_hygiene",
+          3.2564102564102564
+        ],
+        [
+          "drinks",
+          4.047745358090186
+        ],
+        [
+          "dvds_blu_ray",
+          4.079365079365079
+        ],
+        [
+          "electronics",
+          4.037468170243725
+        ],
+        [
+          "fashio_female_clothing",
+          3.78
+        ],
+        [
+          "fashion_bags_accessories",
+          4.144678764100049
+        ],
+        [
+          "fashion_childrens_clothes",
+          4.5
+        ],
+        [
+          "fashion_male_clothing",
+          3.6412213740458017
+        ],
+        [
+          "fashion_shoes",
+          4.233716475095785
+        ],
+        [
+          "fashion_sport",
+          4.258064516129032
+        ],
+        [
+          "fashion_underwear_beach",
+          3.976923076923077
+        ],
+        [
+          "fixed_telephony",
+          3.683206106870229
+        ],
+        [
+          "flowers",
+          4.419354838709677
+        ],
+        [
+          "food",
+          4.218181818181818
+        ],
+        [
+          "food_drink",
+          4.315412186379929
+        ],
+        [
+          "furniture_bedroom",
+          4.118181818181818
+        ],
+        [
+          "furniture_decor",
+          3.9034929780338494
+        ],
+        [
+          "furniture_living_room",
+          3.904382470119522
+        ],
+        [
+          "furniture_mattress_and_upholstery",
+          3.8157894736842106
+        ],
+        [
+          "garden_tools",
+          4.042735042735043
+        ],
+        [
+          "health_beauty",
+          4.1427682737169516
+        ],
+        [
+          "home_appliances",
+          4.172456575682382
+        ],
+        [
+          "home_appliances_2",
+          4.142857142857143
+        ],
+        [
+          "home_comfort_2",
+          3.6296296296296298
+        ],
+        [
+          "home_confort",
+          3.829885057471264
+        ],
+        [
+          "home_construction",
+          3.94
+        ],
+        [
+          "housewares",
+          4.055019444044361
+        ]
+      ],
+      "gold_rows": [
+        [
+          null,
+          3.912786657400973
+        ],
+        [
+          "agro_industry_and_commerce",
+          4.021978021978022
+        ],
+        [
+          "air_conditioning",
+          4.028112449799197
+        ],
+        [
+          "art",
+          4.025
+        ],
+        [
+          "arts_and_craftmanship",
+          4.173913043478261
+        ],
+        [
+          "audio",
+          3.8342939481268012
+        ],
+        [
+          "auto",
+          4.090147020892442
+        ],
+        [
+          "baby",
+          4.038622859140161
+        ],
+        [
+          "bed_bath_table",
+          3.9707398260496083
+        ],
+        [
+          "books_general_interest",
+          4.46259842519685
+        ],
+        [
+          "books_imported",
+          4.320754716981132
+        ],
+        [
+          "books_technical",
+          4.400778210116732
+        ],
+        [
+          "cds_dvds_musicals",
+          4.666666666666667
+        ],
+        [
+          "christmas_supplies",
+          4.055555555555555
+        ],
+        [
+          "cine_photo",
+          4.230769230769231
+        ],
+        [
+          "computers",
+          4.174157303370786
+        ],
+        [
+          "computers_accessories",
+          4.026244548052339
+        ],
+        [
+          "consoles_games",
+          4.065114068441065
+        ],
+        [
+          "construction_tools_construction",
+          4.0814266487214
+        ],
+        [
+          "construction_tools_lights",
+          4.124481327800829
+        ],
+        [
+          "construction_tools_safety",
+          3.8493975903614457
+        ],
+        [
+          "cool_stuff",
+          4.169630452903585
+        ],
+        [
+          "costruction_tools_garden",
+          4.190721649484536
+        ],
+        [
+          "costruction_tools_tools",
+          4.425531914893617
+        ],
+        [
+          "diapers_and_hygiene",
+          3.740740740740741
+        ],
+        [
+          "drinks",
+          4.162162162162162
+        ],
+        [
+          "dvds_blu_ray",
+          4.086206896551724
+        ],
+        [
+          "electronics",
+          4.095219280916634
+        ],
+        [
+          "fashio_female_clothing",
+          3.730769230769231
+        ],
+        [
+          "fashion_bags_accessories",
+          4.189590075512406
+        ],
+        [
+          "fashion_childrens_clothes",
+          4.5
+        ],
+        [
+          "fashion_male_clothing",
+          3.7027027027027026
+        ],
+        [
+          "fashion_shoes",
+          4.218220338983051
+        ],
+        [
+          "fashion_sport",
+          4.2592592592592595
+        ],
+        [
+          "fashion_underwear_beach",
+          3.933333333333333
+        ],
+        [
+          "fixed_telephony",
+          3.9018691588785046
+        ],
+        [
+          "flowers",
+          4.392857142857143
+        ],
+        [
+          "food",
+          4.276404494382023
+        ],
+        [
+          "food_drink",
+          4.382743362831858
+        ],
+        [
+          "furniture_bedroom",
+          4.131578947368421
+        ],
+        [
+          "furniture_decor",
+          4.009690528290091
+        ],
+        [
+          "furniture_living_room",
+          4.028776978417266
+        ],
+        [
+          "furniture_mattress_and_upholstery",
+          3.8157894736842106
+        ],
+        [
+          "garden_tools",
+          4.136155606407323
+        ],
+        [
+          "health_beauty",
+          4.181203207539999
+        ],
+        [
+          "home_appliances",
+          4.160096364432764
+        ],
+        [
+          "home_appliances_2",
+          4.133620689655173
+        ],
+        [
+          "home_comfort_2",
+          3.8260869565217392
+        ],
+        [
+          "home_confort",
+          3.8632911392405065
+        ],
+        [
+          "home_construction",
+          3.9671457905544147
+        ]
+      ],
+      "latency_seconds": 21.089,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1951,
+          "output_tokens": 119,
+          "prefill_s": 1.5,
+          "gen_s": 16.3,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.5
+    },
+    {
+      "id": "categories_then_state",
+      "category": "multi_turn",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": false,
+      "error": "",
+      "sql": "SELECT COALESCE(pct.product_category_name_english, pc.product_category_name) AS category, c.customer_state, SUM(oi.price) AS revenue FROM order_items AS oi JOIN orders AS o ON oi.order_id = o.order_id JOIN products AS pc ON oi.product_id = pc.product_id LEFT JOIN product_category_name_translation AS pct ON pc.product_category_name = pct.product_category_name JOIN customers AS c ON o.customer_id = c.customer_id WHERE STRFTIME('%Y', o.order_purchase_timestamp) = '2017' GROUP BY category, c.customer_state ORDER BY revenue DESC LIMIT 5",
+      "rows": [
+        [
+          "bed_bath_table",
+          "SP",
+          207464.77
+        ],
+        [
+          "watches_gifts",
+          "SP",
+          180111.08
+        ],
+        [
+          "sports_leisure",
+          "SP",
+          170477.61000000002
+        ],
+        [
+          "health_beauty",
+          "SP",
+          157210.18
+        ],
+        [
+          "computers_accessories",
+          "SP",
+          138375.16
+        ]
+      ],
+      "gold_rows": [
+        [
+          "bed_bath_table",
+          "AC",
+          567.7
+        ],
+        [
+          "bed_bath_table",
+          "AL",
+          1188.57
+        ],
+        [
+          "bed_bath_table",
+          "AM",
+          469.5
+        ],
+        [
+          "bed_bath_table",
+          "AP",
+          669.5
+        ],
+        [
+          "bed_bath_table",
+          "BA",
+          12782.3
+        ],
+        [
+          "bed_bath_table",
+          "CE",
+          3814.46
+        ],
+        [
+          "bed_bath_table",
+          "DF",
+          7352.01
+        ],
+        [
+          "bed_bath_table",
+          "ES",
+          12027.85
+        ],
+        [
+          "bed_bath_table",
+          "GO",
+          12804.02
+        ],
+        [
+          "bed_bath_table",
+          "MA",
+          3094.46
+        ],
+        [
+          "bed_bath_table",
+          "MG",
+          64516.71
+        ],
+        [
+          "bed_bath_table",
+          "MS",
+          3960.95
+        ],
+        [
+          "bed_bath_table",
+          "MT",
+          3443.4900000000002
+        ],
+        [
+          "bed_bath_table",
+          "PA",
+          2513.4700000000003
+        ],
+        [
+          "bed_bath_table",
+          "PB",
+          2353.8
+        ],
+        [
+          "bed_bath_table",
+          "PE",
+          5879.87
+        ],
+        [
+          "bed_bath_table",
+          "PI",
+          2142.48
+        ],
+        [
+          "bed_bath_table",
+          "PR",
+          23598.420000000002
+        ],
+        [
+          "bed_bath_table",
+          "RJ",
+          80413.07
+        ],
+        [
+          "bed_bath_table",
+          "RN",
+          1735.46
+        ],
+        [
+          "bed_bath_table",
+          "RO",
+          1245.57
+        ],
+        [
+          "bed_bath_table",
+          "RS",
+          29150.56
+        ],
+        [
+          "bed_bath_table",
+          "SC",
+          13591.6
+        ],
+        [
+          "bed_bath_table",
+          "SE",
+          1389.5
+        ],
+        [
+          "bed_bath_table",
+          "SP",
+          207464.77
+        ],
+        [
+          "bed_bath_table",
+          "TO",
+          270.34000000000003
+        ],
+        [
+          "computers_accessories",
+          "AC",
+          973.58
+        ],
+        [
+          "computers_accessories",
+          "AL",
+          4789.54
+        ],
+        [
+          "computers_accessories",
+          "AM",
+          686.89
+        ],
+        [
+          "computers_accessories",
+          "AP",
+          204.49
+        ],
+        [
+          "computers_accessories",
+          "BA",
+          19116.24
+        ],
+        [
+          "computers_accessories",
+          "CE",
+          6847.09
+        ],
+        [
+          "computers_accessories",
+          "DF",
+          15272.52
+        ],
+        [
+          "computers_accessories",
+          "ES",
+          6062.91
+        ],
+        [
+          "computers_accessories",
+          "GO",
+          6800.26
+        ],
+        [
+          "computers_accessories",
+          "MA",
+          3874.75
+        ],
+        [
+          "computers_accessories",
+          "MG",
+          44202.13
+        ],
+        [
+          "computers_accessories",
+          "MS",
+          5800.24
+        ],
+        [
+          "computers_accessories",
+          "MT",
+          6166.44
+        ],
+        [
+          "computers_accessories",
+          "PA",
+          6256.3
+        ],
+        [
+          "computers_accessories",
+          "PB",
+          3902.6200000000003
+        ],
+        [
+          "computers_accessories",
+          "PE",
+          5375.14
+        ],
+        [
+          "computers_accessories",
+          "PI",
+          1490.9099999999999
+        ],
+        [
+          "computers_accessories",
+          "PR",
+          17863.5
+        ],
+        [
+          "computers_accessories",
+          "RJ",
+          60313.53
+        ],
+        [
+          "computers_accessories",
+          "RN",
+          1152.02
+        ],
+        [
+          "computers_accessories",
+          "RO",
+          583.29
+        ],
+        [
+          "computers_accessories",
+          "RR",
+          88.8
+        ],
+        [
+          "computers_accessories",
+          "RS",
+          25523.09
+        ],
+        [
+          "computers_accessories",
+          "SC",
+          19031.32
+        ]
+      ],
+      "latency_seconds": 69.7,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1954,
+          "output_tokens": 153,
+          "prefill_s": 1.5,
+          "gen_s": 20.9,
+          "load_s": 0.1
+        },
+        {
+          "label": "plan",
+          "prompt_tokens": 2177,
+          "output_tokens": 188,
+          "prefill_s": 15.3,
+          "gen_s": 26.9,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 16.8
+    },
+    {
+      "id": "add_delivered_filter",
+      "category": "multi_turn",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "clarify",
+      "passed": false,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 47.609,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1954,
+          "output_tokens": 107,
+          "prefill_s": 2.4,
+          "gen_s": 14.7,
+          "load_s": 0.1
+        },
+        {
+          "label": "plan",
+          "prompt_tokens": 2133,
+          "output_tokens": 108,
+          "prefill_s": 14.0,
+          "gen_s": 15.3,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 16.4
+    },
+    {
+      "id": "compare_with_2018",
+      "category": "multi_turn",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT COALESCE(pct.product_category_name_english, pc.product_category_name) AS product_category, SUM(CASE WHEN STRFTIME('%Y', o.order_purchase_timestamp) = '2017' THEN oi.price ELSE 0 END) AS revenue_2017, SUM(CASE WHEN STRFTIME('%Y', o.order_purchase_timestamp) = '2018' THEN oi.price ELSE 0 END) AS revenue_2018 FROM order_items AS oi JOIN orders AS o ON oi.order_id = o.order_id JOIN products AS pc ON oi.product_id = pc.product_id LEFT JOIN product_category_name_translation AS pct ON pc.product_category_name = pct.product_category_name WHERE STRFTIME('%Y', o.order_purchase_timestamp) IN ('2017', '2018') GROUP BY product_category LIMIT 200",
+      "rows": [
+        [
+          null,
+          106047.31,
+          73422.08
+        ],
+        [
+          "agro_industry_and_commerce",
+          29179.2,
+          43351.27
+        ],
+        [
+          "air_conditioning",
+          28253.01,
+          25064.86
+        ],
+        [
+          "art",
+          9291.79,
+          14910.85
+        ],
+        [
+          "arts_and_craftmanship",
+          151.89000000000001,
+          1662.1200000000001
+        ],
+        [
+          "audio",
+          17570.57,
+          32960.94
+        ],
+        [
+          "auto",
+          243255.71,
+          347631.15
+        ],
+        [
+          "baby",
+          153334.03,
+          256800.7
+        ],
+        [
+          "bed_bath_table",
+          498440.43,
+          538069.26
+        ],
+        [
+          "books_general_interest",
+          19630.49,
+          27106.89
+        ],
+        [
+          "books_imported",
+          1123.99,
+          3515.86
+        ],
+        [
+          "books_technical",
+          5762.22,
+          13066.84
+        ],
+        [
+          "cds_dvds_musicals",
+          665.0,
+          65.0
+        ],
+        [
+          "christmas_supplies",
+          2854.92,
+          5945.900000000001
+        ],
+        [
+          "cine_photo",
+          695.0,
+          6238.46
+        ],
+        [
+          "computers",
+          159230.79,
+          63732.34
+        ],
+        [
+          "computers_accessories",
+          405078.69,
+          505476.31
+        ],
+        [
+          "consoles_games",
+          88394.45,
+          65188.51
+        ],
+        [
+          "construction_tools_construction",
+          20315.28,
+          124362.31
+        ],
+        [
+          "construction_tools_lights",
+          4053.48,
+          37026.52
+        ],
+        [
+          "construction_tools_safety",
+          8264.8,
+          32279.72
+        ],
+        [
+          "cool_stuff",
+          393620.65,
+          240559.2
+        ],
+        [
+          "costruction_tools_garden",
+          8907.69,
+          16808.2
+        ],
+        [
+          "costruction_tools_tools",
+          4087.29,
+          11816.66
+        ],
+        [
+          "diapers_and_hygiene",
+          76.0,
+          1356.69
+        ],
+        [
+          "drinks",
+          5004.06,
+          17424.64
+        ],
+        [
+          "dvds_blu_ray",
+          4866.68,
+          1132.71
+        ],
+        [
+          "electronics",
+          56011.159999999996,
+          102928.59
+        ],
+        [
+          "fashio_female_clothing",
+          2132.08,
+          616.66
+        ],
+        [
+          "fashion_bags_accessories",
+          81565.15,
+          70739.19
+        ],
+        [
+          "fashion_childrens_clothes",
+          399.88,
+          169.97
+        ],
+        [
+          "fashion_male_clothing",
+          8471.05,
+          2301.87
+        ],
+        [
+          "fashion_shoes",
+          15036.11,
+          8496.67
+        ],
+        [
+          "fashion_sport",
+          1750.01,
+          369.5
+        ],
+        [
+          "fashion_underwear_beach",
+          7072.55,
+          2469.0
+        ],
+        [
+          "fixed_telephony",
+          30372.84,
+          28505.28
+        ],
+        [
+          "flowers",
+          270.5,
+          839.54
+        ],
+        [
+          "food",
+          8737.89,
+          20575.62
+        ],
+        [
+          "food_drink",
+          7447.74,
+          7731.74
+        ],
+        [
+          "furniture_bedroom",
+          8847.61,
+          11181.17
+        ],
+        [
+          "furniture_decor",
+          337213.12,
+          386668.59
+        ],
+        [
+          "furniture_living_room",
+          35284.409999999996,
+          33632.15
+        ],
+        [
+          "furniture_mattress_and_upholstery",
+          2548.28,
+          1819.8
+        ],
+        [
+          "garden_tools",
+          268882.71,
+          215013.87
+        ],
+        [
+          "health_beauty",
+          481755.71,
+          772238.15
+        ],
+        [
+          "home_appliances",
+          23850.83,
+          56320.7
+        ],
+        [
+          "home_appliances_2",
+          24064.88,
+          89252.86
+        ],
+        [
+          "home_comfort_2",
+          609.1800000000001,
+          151.09
+        ],
+        [
+          "home_confort",
+          37688.590000000004,
+          20883.45
+        ],
+        [
+          "home_construction",
+          23952.45,
+          59135.67
+        ]
+      ],
+      "gold_rows": null,
+      "latency_seconds": 133.567,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1954,
+          "output_tokens": 150,
+          "prefill_s": 2.6,
+          "gen_s": 21.4,
+          "load_s": 0.2
+        },
+        {
+          "label": "plan",
+          "prompt_tokens": 2181,
+          "output_tokens": 245,
+          "prefill_s": 19.2,
+          "gen_s": 86.9,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 21.8
+    },
+    {
+      "id": "full_followup_chain",
+      "category": "multi_turn",
+      "heldout": true,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT COALESCE(pct.product_category_name_english, pc.product_category_name) AS category, c.customer_state, SUM(oi.price) AS revenue, STRFTIME('%Y', o.order_purchase_timestamp) AS year FROM order_items AS oi JOIN orders AS o ON oi.order_id = o.order_id JOIN products AS pc ON oi.product_id = pc.product_id LEFT JOIN product_category_name_translation AS pct ON pc.product_category_name = pct.product_category_name JOIN customers AS c ON o.customer_id = c.customer_id WHERE STRFTIME('%Y', o.order_purchase_timestamp) IN ('2017', '2018') AND o.order_status = 'delivered' GROUP BY category, c.customer_state, year ORDER BY category, c.customer_state, revenue DESC LIMIT 200",
+      "rows": [
+        [
+          null,
+          "AC",
+          66.9,
+          "2017"
+        ],
+        [
+          null,
+          "AL",
+          299.99,
+          "2018"
+        ],
+        [
+          null,
+          "AL",
+          274.99,
+          "2017"
+        ],
+        [
+          null,
+          "AM",
+          541.8,
+          "2017"
+        ],
+        [
+          null,
+          "BA",
+          3242.56,
+          "2018"
+        ],
+        [
+          null,
+          "BA",
+          2681.39,
+          "2017"
+        ],
+        [
+          null,
+          "CE",
+          2059.23,
+          "2018"
+        ],
+        [
+          null,
+          "CE",
+          954.46,
+          "2017"
+        ],
+        [
+          null,
+          "DF",
+          1385.62,
+          "2017"
+        ],
+        [
+          null,
+          "DF",
+          1193.2,
+          "2018"
+        ],
+        [
+          null,
+          "ES",
+          980.14,
+          "2017"
+        ],
+        [
+          null,
+          "ES",
+          634.13,
+          "2018"
+        ],
+        [
+          null,
+          "GO",
+          5186.29,
+          "2017"
+        ],
+        [
+          null,
+          "GO",
+          3343.82,
+          "2018"
+        ],
+        [
+          null,
+          "MA",
+          1363.03,
+          "2017"
+        ],
+        [
+          null,
+          "MA",
+          35.9,
+          "2018"
+        ],
+        [
+          null,
+          "MG",
+          10141.01,
+          "2017"
+        ],
+        [
+          null,
+          "MG",
+          7844.73,
+          "2018"
+        ],
+        [
+          null,
+          "MS",
+          354.28,
+          "2018"
+        ],
+        [
+          null,
+          "MS",
+          281.68,
+          "2017"
+        ],
+        [
+          null,
+          "MT",
+          672.03,
+          "2018"
+        ],
+        [
+          null,
+          "MT",
+          370.37,
+          "2017"
+        ],
+        [
+          null,
+          "PA",
+          7472.5,
+          "2017"
+        ],
+        [
+          null,
+          "PA",
+          1076.56,
+          "2018"
+        ],
+        [
+          null,
+          "PB",
+          2550.77,
+          "2017"
+        ],
+        [
+          null,
+          "PB",
+          192.76,
+          "2018"
+        ],
+        [
+          null,
+          "PE",
+          2658.19,
+          "2017"
+        ],
+        [
+          null,
+          "PE",
+          1479.44,
+          "2018"
+        ],
+        [
+          null,
+          "PI",
+          430.17,
+          "2018"
+        ],
+        [
+          null,
+          "PI",
+          144.0,
+          "2017"
+        ],
+        [
+          null,
+          "PR",
+          4329.56,
+          "2017"
+        ],
+        [
+          null,
+          "PR",
+          3989.67,
+          "2018"
+        ],
+        [
+          null,
+          "RJ",
+          16393.61,
+          "2017"
+        ],
+        [
+          null,
+          "RJ",
+          6316.67,
+          "2018"
+        ],
+        [
+          null,
+          "RN",
+          375.75,
+          "2018"
+        ],
+        [
+          null,
+          "RN",
+          202.79,
+          "2017"
+        ],
+        [
+          null,
+          "RO",
+          499.76,
+          "2018"
+        ],
+        [
+          null,
+          "RO",
+          79.9,
+          "2017"
+        ],
+        [
+          null,
+          "RR",
+          245.98,
+          "2018"
+        ],
+        [
+          null,
+          "RS",
+          4734.4,
+          "2018"
+        ],
+        [
+          null,
+          "RS",
+          3161.21,
+          "2017"
+        ],
+        [
+          null,
+          "SC",
+          5020.72,
+          "2018"
+        ],
+        [
+          null,
+          "SC",
+          1960.94,
+          "2017"
+        ],
+        [
+          null,
+          "SE",
+          125.85,
+          "2017"
+        ],
+        [
+          null,
+          "SE",
+          47.9,
+          "2018"
+        ],
+        [
+          null,
+          "SP",
+          36326.81,
+          "2017"
+        ],
+        [
+          null,
+          "SP",
+          26504.29,
+          "2018"
+        ],
+        [
+          null,
+          "TO",
+          432.99,
+          "2017"
+        ],
+        [
+          "agro_industry_and_commerce",
+          "AL",
+          1476.3,
+          "2018"
+        ],
+        [
+          "agro_industry_and_commerce",
+          "AP",
+          589.99,
+          "2017"
+        ]
+      ],
+      "gold_rows": null,
+      "latency_seconds": 169.804,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1954,
+          "output_tokens": 153,
+          "prefill_s": 3.3,
+          "gen_s": 22.7,
+          "load_s": 0.1
+        },
+        {
+          "label": "plan",
+          "prompt_tokens": 2177,
+          "output_tokens": 188,
+          "prefill_s": 19.3,
+          "gen_s": 28.1,
+          "load_s": 0.1
+        },
+        {
+          "label": "plan",
+          "prompt_tokens": 2287,
+          "output_tokens": 108,
+          "prefill_s": 20.7,
+          "gen_s": 15.8,
+          "load_s": 0.1
+        },
+        {
+          "label": "plan",
+          "prompt_tokens": 2368,
+          "output_tokens": 232,
+          "prefill_s": 20.1,
+          "gen_s": 34.5,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 63.4
+    },
+    {
+      "id": "clarify_best_sellers",
+      "category": "ambiguity",
+      "heldout": false,
+      "expected_action": "clarify",
+      "actual_action": "clarify",
+      "passed": true,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 12.9,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1947,
+          "output_tokens": 72,
+          "prefill_s": 2.4,
+          "gen_s": 10.3,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 2.4
+    },
+    {
+      "id": "clarify_sales_performance",
+      "category": "ambiguity",
+      "heldout": false,
+      "expected_action": "clarify",
+      "actual_action": "clarify",
+      "passed": true,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 14.424,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1946,
+          "output_tokens": 88,
+          "prefill_s": 1.5,
+          "gen_s": 12.6,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.5
+    },
+    {
+      "id": "clarify_best_categories",
+      "category": "ambiguity",
+      "heldout": true,
+      "expected_action": "clarify",
+      "actual_action": "clarify",
+      "passed": true,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 10.226,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1948,
+          "output_tokens": 58,
+          "prefill_s": 1.7,
+          "gen_s": 8.3,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.7
+    },
+    {
+      "id": "clarify_focus",
+      "category": "ambiguity",
+      "heldout": false,
+      "expected_action": "clarify",
+      "actual_action": "clarify",
+      "passed": true,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 10.187,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1947,
+          "output_tokens": 58,
+          "prefill_s": 1.6,
+          "gen_s": 8.4,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.6
+    },
+    {
+      "id": "refuse_profit",
+      "category": "refusal",
+      "heldout": false,
+      "expected_action": "refuse",
+      "actual_action": "clarify",
+      "passed": false,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 8.819,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1948,
+          "output_tokens": 48,
+          "prefill_s": 1.7,
+          "gen_s": 6.9,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.7
+    },
+    {
+      "id": "refuse_2019",
+      "category": "refusal",
+      "heldout": false,
+      "expected_action": "refuse",
+      "actual_action": "refuse",
+      "passed": true,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 9.999,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1954,
+          "output_tokens": 53,
+          "prefill_s": 2.1,
+          "gen_s": 7.6,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 2.1
+    },
+    {
+      "id": "refuse_names",
+      "category": "refusal",
+      "heldout": true,
+      "expected_action": "refuse",
+      "actual_action": "refuse",
+      "passed": true,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 9.216,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1953,
+          "output_tokens": 45,
+          "prefill_s": 2.1,
+          "gen_s": 6.9,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 2.1
+    },
+    {
+      "id": "refuse_off_topic",
+      "category": "refusal",
+      "heldout": false,
+      "expected_action": "refuse",
+      "actual_action": "refuse",
+      "passed": true,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 9.283,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1949,
+          "output_tokens": 51,
+          "prefill_s": 1.8,
+          "gen_s": 7.3,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.8
+    },
+    {
+      "id": "trap_join_fanout",
+      "category": "data_trap",
+      "heldout": false,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT STRFTIME('%Y-%m', o.order_purchase_timestamp) AS month, SUM(i.price) AS revenue FROM orders AS o JOIN order_items AS i USING (order_id) GROUP BY month LIMIT 200",
+      "rows": [
+        [
+          "2016-09",
+          267.36
+        ],
+        [
+          "2016-10",
+          49507.66
+        ],
+        [
+          "2016-12",
+          10.9
+        ],
+        [
+          "2017-01",
+          120312.87
+        ],
+        [
+          "2017-02",
+          247303.02
+        ],
+        [
+          "2017-03",
+          374344.3
+        ],
+        [
+          "2017-04",
+          359927.23
+        ],
+        [
+          "2017-05",
+          506071.14
+        ],
+        [
+          "2017-06",
+          433038.6
+        ],
+        [
+          "2017-07",
+          498031.48
+        ],
+        [
+          "2017-08",
+          573971.68
+        ],
+        [
+          "2017-09",
+          624401.6900000001
+        ],
+        [
+          "2017-10",
+          664219.43
+        ],
+        [
+          "2017-11",
+          1010271.37
+        ],
+        [
+          "2017-12",
+          743914.17
+        ],
+        [
+          "2018-01",
+          950030.36
+        ],
+        [
+          "2018-02",
+          844178.71
+        ],
+        [
+          "2018-03",
+          983213.44
+        ],
+        [
+          "2018-04",
+          996647.75
+        ],
+        [
+          "2018-05",
+          996517.68
+        ],
+        [
+          "2018-06",
+          865124.31
+        ],
+        [
+          "2018-07",
+          895507.22
+        ],
+        [
+          "2018-08",
+          854686.33
+        ],
+        [
+          "2018-09",
+          145.0
+        ]
+      ],
+      "gold_rows": [
+        [
+          "2016-09",
+          267.36
+        ],
+        [
+          "2016-10",
+          49507.66
+        ],
+        [
+          "2016-12",
+          10.9
+        ],
+        [
+          "2017-01",
+          120312.87
+        ],
+        [
+          "2017-02",
+          247303.02
+        ],
+        [
+          "2017-03",
+          374344.3
+        ],
+        [
+          "2017-04",
+          359927.23
+        ],
+        [
+          "2017-05",
+          506071.14
+        ],
+        [
+          "2017-06",
+          433038.6
+        ],
+        [
+          "2017-07",
+          498031.48
+        ],
+        [
+          "2017-08",
+          573971.68
+        ],
+        [
+          "2017-09",
+          624401.6900000001
+        ],
+        [
+          "2017-10",
+          664219.43
+        ],
+        [
+          "2017-11",
+          1010271.37
+        ],
+        [
+          "2017-12",
+          743914.17
+        ],
+        [
+          "2018-01",
+          950030.36
+        ],
+        [
+          "2018-02",
+          844178.71
+        ],
+        [
+          "2018-03",
+          983213.44
+        ],
+        [
+          "2018-04",
+          996647.75
+        ],
+        [
+          "2018-05",
+          996517.68
+        ],
+        [
+          "2018-06",
+          865124.31
+        ],
+        [
+          "2018-07",
+          895507.22
+        ],
+        [
+          "2018-08",
+          854686.33
+        ],
+        [
+          "2018-09",
+          145.0
+        ]
+      ],
+      "latency_seconds": 15.408,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1949,
+          "output_tokens": 82,
+          "prefill_s": 1.9,
+          "gen_s": 11.7,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.9
+    },
+    {
+      "id": "trap_unique_customers",
+      "category": "data_trap",
+      "heldout": true,
+      "expected_action": "answer",
+      "actual_action": "answer",
+      "passed": true,
+      "error": "",
+      "sql": "SELECT COUNT(DISTINCT c.customer_unique_id) AS customers FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id LIMIT 200",
+      "rows": [
+        [
+          96096
+        ]
+      ],
+      "gold_rows": [
+        [
+          96096
+        ]
+      ],
+      "latency_seconds": 12.727,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1948,
+          "output_tokens": 70,
+          "prefill_s": 1.7,
+          "gen_s": 10.1,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 1.7
+    },
+    {
+      "id": "refuse_not_a_question",
+      "category": "refusal",
+      "heldout": false,
+      "expected_action": "refuse",
+      "actual_action": "refuse",
+      "passed": true,
+      "error": "",
+      "sql": "",
+      "rows": [],
+      "gold_rows": null,
+      "latency_seconds": 6.198,
+      "retries": 0,
+      "llm_calls": [
+        {
+          "label": "plan",
+          "prompt_tokens": 1959,
+          "output_tokens": 25,
+          "prefill_s": 2.5,
+          "gen_s": 3.5,
+          "load_s": 0.1
+        }
+      ],
+      "prefill_seconds": 2.5
+    }
+  ]
+}

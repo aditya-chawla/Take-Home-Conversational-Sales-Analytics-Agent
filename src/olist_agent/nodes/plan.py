@@ -21,6 +21,7 @@ def plan_node(llm: Any, db_path, state: AgentState) -> dict:
             question=state.get("rewritten") or state["question"],
             history=history,
             last_query=state.get("last_query", {}),
+            repair_block="",
         ),
         label="plan",
     )
