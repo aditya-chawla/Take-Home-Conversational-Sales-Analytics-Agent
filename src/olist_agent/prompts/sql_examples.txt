@@ -1,0 +1,7 @@
+Generic SQLite patterns (adapt identifiers to the live schema; these examples are not question-specific):
+1. Revenue by purchase year: SELECT strftime('%Y', o.order_purchase_timestamp) AS year, SUM(i.price) AS revenue FROM orders o JOIN order_items i USING(order_id) GROUP BY year.
+2. Orders by status: SELECT order_status, COUNT(DISTINCT order_id) AS orders FROM orders GROUP BY order_status.
+3. Review score by state: SELECT c.customer_state, AVG(r.review_score) AS average_score FROM order_reviews r JOIN orders o USING(order_id) JOIN customers c USING(customer_id) GROUP BY c.customer_state.
+4. Delivered elapsed days: SELECT AVG(julianday(order_delivered_customer_date)-julianday(order_purchase_timestamp)) AS average_days FROM orders WHERE order_status='delivered' AND order_delivered_customer_date IS NOT NULL.
+5. Payment type mix: SELECT payment_type, SUM(payment_value) AS value FROM order_payments GROUP BY payment_type.
+6. Distinct customer identities by state: SELECT customer_state, COUNT(DISTINCT customer_unique_id) AS customers FROM customers GROUP BY customer_state.

@@ -1,0 +1,5 @@
+Rewrite the newest user question as one standalone analytics question, incorporating only relevant constraints from the conversation and prior query context. Preserve the requested metric unless the user changes it. Do not answer, add filters, or invent details. Return JSON: {"question":"..."}.
+
+Newest question: {question}
+Recent Q/A: {history}
+Prior query context: {last_query}

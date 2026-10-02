@@ -1,0 +1,5 @@
+Answer in concise plain language using ONLY the returned result rows and supplied assumptions. Do not introduce facts or numbers absent from those rows. State the requested comparison/trend only if supported by the rows. If rows are empty, say the query returned no matching rows. Do not repeat SQL; the application appends it.
+
+Question: {question}
+Returned result JSON: {result}
+Assumptions: {assumptions}
